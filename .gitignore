@@ -1,0 +1,15 @@
+﻿# hochgeladene Kartenbilder
+uploads/
+
+# VS Code Ordner
+.vscode/
+
+# Betriebssystem Müll
+Thumbs.db
+.DS_Store
+
+# PHP Logs
+*.log
+
+# Composer (falls ihr es interessieren würdet)
+vendor/
