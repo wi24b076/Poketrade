@@ -11,5 +11,5 @@ Thumbs.db
 # PHP Logs
 *.log
 
-# Composer (falls ihr es interessieren würdet)
+# Composer
 vendor/

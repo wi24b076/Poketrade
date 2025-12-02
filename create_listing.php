@@ -2,13 +2,14 @@
 ini_set('display_errors', 1);
 error_reporting(E_ALL);
 
-session_start();
-if (!isset($_SESSION['user_id'])) {
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
+if (empty($_SESSION['user_id'])) {
     header('Location: login.php');
     exit;
 }
 
-// DB-Verbindung
 $host = 'localhost';
 $db   = 'poketrade';
 $user = 'root';
@@ -33,12 +34,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if ($title === '' || $price === '') {
         $errors[] = "Titel und Preis sind Pflichtfelder.";
     }
-
-    if (!is_numeric($price)) {
+    if ($price !== '' && !is_numeric($price)) {
         $errors[] = "Preis muss eine Zahl sein.";
     }
 
-    // Bild-Upload (optional, aber empfohlen)
     $imagePath = null;
     if (!empty($_FILES['image']['name'])) {
         $uploadDir  = __DIR__ . '/uploads/';
@@ -68,7 +67,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             INSERT INTO listings (user_id, title, description, card_condition, price, image_path)
             VALUES (:uid, :t, :d, :c, :p, :img)
         ");
-
         $stmt->execute([
             ':uid' => $_SESSION['user_id'],
             ':t'   => $title,
@@ -77,22 +75,20 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             ':p'   => $price,
             ':img' => $imagePath
         ]);
-
         $success = true;
+        // Formular leeren
+        $_POST = [];
     }
 }
+
+$pageTitle = 'Listing erstellen – Poketrade';
+require_once __DIR__ . '/includes/header.php';
 ?>
-<!DOCTYPE html>
-<html lang="de">
-<head>
-    <meta charset="UTF-8">
-    <title>Listing erstellen – Poketrade</title>
-</head>
-<body>
-<h1>Neues Listing erstellen</h1>
+
+<h1 class="mb-4">Neues Listing erstellen</h1>
 
 <?php if (!empty($errors)): ?>
-    <div style="color:red;">
+    <div class="alert alert-danger">
         <?php foreach ($errors as $e): ?>
             <div><?= htmlspecialchars($e) ?></div>
         <?php endforeach; ?>
@@ -100,47 +96,46 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <?php endif; ?>
 
 <?php if ($success): ?>
-    <div style="color:green;">
+    <div class="alert alert-success">
         Listing wurde erstellt!
-        <a href="browse.php">Alle Listings ansehen</a>
+        <a href="browse.php" class="alert-link">Alle Listings ansehen</a>
     </div>
 <?php endif; ?>
 
-<form method="post" enctype="multipart/form-data">
-    <div>
-        <label>Titel</label><br>
-        <input type="text" name="title"
+<form method="post" enctype="multipart/form-data" class="card p-3 shadow-sm">
+    <div class="mb-3">
+        <label class="form-label">Titel</label>
+        <input class="form-control" type="text" name="title"
                value="<?= htmlspecialchars($_POST['title'] ?? '') ?>">
     </div>
 
-    <div>
-        <label>Beschreibung</label><br>
-        <textarea name="description" rows="4" cols="40"><?= htmlspecialchars($_POST['description'] ?? '') ?></textarea>
+    <div class="mb-3">
+        <label class="form-label">Beschreibung</label>
+        <textarea class="form-control" name="description" rows="4"><?= htmlspecialchars($_POST['description'] ?? '') ?></textarea>
     </div>
 
-    <div>
-        <label>Zustand</label><br>
-        <select name="condition">
-            <option value="mint">Mint</option>
-            <option value="good">Good</option>
-            <option value="played">Played</option>
-            <option value="poor">Poor</option>
+    <div class="mb-3">
+        <label class="form-label">Zustand</label>
+        <select class="form-select" name="condition">
+            <option value="mint"   <?= (($_POST['condition'] ?? 'good') === 'mint')   ? 'selected' : '' ?>>Mint</option>
+            <option value="good"   <?= (($_POST['condition'] ?? 'good') === 'good')   ? 'selected' : '' ?>>Good</option>
+            <option value="played" <?= (($_POST['condition'] ?? 'good') === 'played') ? 'selected' : '' ?>>Played</option>
+            <option value="poor"   <?= (($_POST['condition'] ?? 'good') === 'poor')   ? 'selected' : '' ?>>Poor</option>
         </select>
     </div>
 
-    <div>
-        <label>Preis (EUR)</label><br>
-        <input type="text" name="price"
+    <div class="mb-3">
+        <label class="form-label">Preis (EUR)</label>
+        <input class="form-control" type="text" name="price"
                value="<?= htmlspecialchars($_POST['price'] ?? '') ?>">
     </div>
 
-    <div>
-        <label>Kartenbild (optional)</label><br>
-        <input type="file" name="image">
+    <div class="mb-3">
+        <label class="form-label">Kartenbild (optional)</label>
+        <input class="form-control" type="file" name="image">
     </div>
 
-    <button type="submit">Listing erstellen</button>
+    <button class="btn btn-success" type="submit">Listing erstellen</button>
 </form>
 
-</body>
-</html>
+<?php require_once __DIR__ . '/includes/footer.php'; ?>
