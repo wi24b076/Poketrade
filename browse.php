@@ -2,7 +2,9 @@
 ini_set('display_errors', 1);
 error_reporting(E_ALL);
 
-session_start();
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
 
 $host = 'localhost';
 $db   = 'poketrade';
@@ -23,35 +25,48 @@ $stmt = $pdo->query("
     ORDER BY l.created_at DESC
 ");
 $listings = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+$pageTitle = 'Alle Listings – Poketrade';
+require_once __DIR__ . '/includes/header.php';
 ?>
-<!DOCTYPE html>
-<html lang="de">
-<head>
-    <meta charset="UTF-8">
-    <title>Browse – Poketrade</title>
-</head>
-<body>
-<h1>Alle Listings</h1>
+
+<h1 class="mb-4">Alle Listings</h1>
 
 <?php if (empty($listings)): ?>
-    <p>Noch keine Listings vorhanden.</p>
+    <div class="alert alert-info">Noch keine Listings vorhanden.</div>
 <?php else: ?>
-    <?php foreach ($listings as $listing): ?>
-        <div style="border:1px solid #ccc; padding:10px; margin-bottom:10px;">
-            <h3><?= htmlspecialchars($listing['title']) ?></h3>
-            <p>von <?= htmlspecialchars($listing['username']) ?></p>
-            <p>Zustand: <?= htmlspecialchars($listing['card_condition']) ?></p>
-            <p>Preis: <?= htmlspecialchars($listing['price']) ?> €</p>
-            <?php if (!empty($listing['image_path'])): ?>
-                <div>
-                    <img src="<?= htmlspecialchars($listing['image_path']) ?>" alt="Karte"
-                         style="max-width:200px;">
+    <div class="row g-3">
+        <?php foreach ($listings as $listing): ?>
+            <div class="col-md-4">
+                <div class="card h-100 shadow-sm">
+                    <?php if (!empty($listing['image_path'])): ?>
+                        <img src="<?= htmlspecialchars($listing['image_path']) ?>"
+                             class="card-img-top"
+                             alt="Karte">
+                    <?php endif; ?>
+                    <div class="card-body">
+                        <h5 class="card-title">
+                            <a href="card_detail.php?id=<?= $listing['id'] ?>">
+                                <?= htmlspecialchars($listing['title']) ?>
+                            </a>
+                        </h5>
+                        <h6 class="card-subtitle mb-2 text-muted">
+                            von <?= htmlspecialchars($listing['username']) ?>
+                        </h6>
+                        <p class="card-text mb-1">
+                            Zustand: <?= htmlspecialchars($listing['card_condition']) ?>
+                        </p>
+                        <p class="card-text fw-bold">
+                            Preis: <?= htmlspecialchars($listing['price']) ?> €
+                        </p>
+                        <p class="card-text small">
+                            <?= nl2br(htmlspecialchars($listing['description'])) ?>
+                        </p>
+                    </div>
                 </div>
-            <?php endif; ?>
-            <p><?= nl2br(htmlspecialchars($listing['description'])) ?></p>
-        </div>
-    <?php endforeach; ?>
+            </div>
+        <?php endforeach; ?>
+    </div>
 <?php endif; ?>
 
-</body>
-</html>
+<?php require_once __DIR__ . '/includes/footer.php'; ?>
