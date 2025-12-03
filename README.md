@@ -1,4 +1,4 @@
-# Poketrade
+
 ```
 Poketrade
 ├─ admin
@@ -7,7 +7,7 @@ Poketrade
 │  ├─ css
 │  │  └─ style.css
 │  ├─ fonts
-│  │  └─ Pokemon Classic.ttf
+│  │  └─ pokemon.ttf
 │  └─ logo.png
 ├─ browse.php
 ├─ card_detail.php
@@ -16,6 +16,8 @@ Poketrade
 ├─ create_listing.php
 ├─ delete_listing.php
 ├─ edit_listing.php
+├─ favorites.php
+├─ favorite_toggle.php
 ├─ includes
 │  ├─ auth.php
 │  ├─ footer.php
@@ -25,6 +27,9 @@ Poketrade
 ├─ logout.php
 ├─ my_listings.php
 ├─ README.md
-└─ register.php
+├─ register.php
+├─ test_font.php
+└─ uploads
+   └─ card_693004435c7981.59054886.png
 
 ```

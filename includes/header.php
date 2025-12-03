@@ -48,6 +48,9 @@ $pageTitle = $pageTitle ?? 'Poketrade';
                         <li class="nav-item">
                             <a class="nav-link pokemon-font" href="/Poketrade/create_listing.php">Listing erstellen</a>
                         </li>
+                        <li class="nav-item">
+                            <a class="nav-link pokemon-font" href="/Poketrade/favorites.php">Favoriten</a>
+                        </li>
 
                         <?php if (!empty($_SESSION['role']) && $_SESSION['role'] === 'admin'): ?>
                             <li class="nav-item">
@@ -55,6 +58,7 @@ $pageTitle = $pageTitle ?? 'Poketrade';
                             </li>
                         <?php endif; ?>
                     <?php endif; ?>
+
                 </ul>
 
                 <ul class="navbar-nav ms-auto mb-2 mb-lg-0">

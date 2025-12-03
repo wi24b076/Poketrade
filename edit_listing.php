@@ -1,4 +1,8 @@
 <?php
+require_once __DIR__ . '/includes/auth.php';
+init_auth($pdo); // versucht ggf. Auto-Login
+// ggf. danach: require_login() oder require_admin()
+
 ini_set('display_errors', 1);
 error_reporting(E_ALL);
 
