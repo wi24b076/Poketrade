@@ -1,11 +1,20 @@
+/* Pokémon-Font einbinden */
 @font-face {
     font-family: 'pokemon';
-    src: url('../fonts/pokemon.ttf') format('truetype');
+    src: url('../fonts/pokemon.woff2') format('woff2'),
+         url('../fonts/pokemon.woff') format('woff'),
+         url('../fonts/pokemon.ttf') format('truetype');
     font-weight: normal;
     font-style: normal;
 }
 
-/* ALLES in der pokemon-Schrift */
+/* Standard-Schriftart der Seite (NICHT Pokémon) */
 body {
-    font-family: 'pokemon', system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+}
+
+/* Klasse, um gezielt Pokémon-Schrift zu aktivieren */
+.pokemon-font {
+    font-family: 'pokemon', sans-serif !important;
+    letter-spacing: 1px;
 }

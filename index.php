@@ -13,7 +13,7 @@ require_once __DIR__ . '/includes/header.php';
 <div class="p-4 bg-white rounded shadow-sm">
     <h1 class="mb-3">Willkommen bei Poketrade</h1>
     <p class="lead">
-        Die Plattform für den Tausch von Pokémon-Karten.
+        Die Plattform für den Tausch von Pokemon-Karten.
     </p>
 
     <?php if (!empty($_SESSION['user_id'])): ?>
