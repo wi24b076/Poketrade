@@ -1,5 +1,4 @@
 <?php
-// Header wird überall eingebunden, daher hier sicherstellen:
 if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
@@ -11,6 +10,7 @@ $pageTitle = $pageTitle ?? 'Poketrade';
 <html lang="de">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
     <title><?= htmlspecialchars($pageTitle) ?></title>
 
     <!-- Bootstrap 5 CSS -->
@@ -20,11 +20,20 @@ $pageTitle = $pageTitle ?? 'Poketrade';
         integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH"
         crossorigin="anonymous"
     >
+
+    <!-- Custom Styles -->
+    <link rel="stylesheet" href="/Poketrade/assets/css/style.css">
 </head>
 <body>
 <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
     <div class="container-fluid">
-        <a class="navbar-brand" href="index.php">Poketrade</a>
+        <!-- Logo immer zur Startseite -->
+        <a class="navbar-brand d-flex align-items-center" href="/Poketrade/index.php">
+            <img src="/Poketrade/assets/logo.png"
+                 alt="Poketrade Logo"
+                 style="height:60px; width:auto;">
+        </a>
+
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse"
                 data-bs-target="#mainNavbar" aria-controls="mainNavbar"
                 aria-expanded="false" aria-label="Navigation umschalten">
@@ -34,20 +43,20 @@ $pageTitle = $pageTitle ?? 'Poketrade';
         <div class="collapse navbar-collapse" id="mainNavbar">
             <ul class="navbar-nav me-auto mb-2 mb-lg-0">
                 <li class="nav-item">
-                    <a class="nav-link" href="browse.php">Alle Listings</a>
+                    <a class="nav-link" href="/Poketrade/browse.php">Alle Listings</a>
                 </li>
 
                 <?php if (!empty($_SESSION['user_id'])): ?>
                     <li class="nav-item">
-                        <a class="nav-link" href="my_listings.php">Meine Listings</a>
+                        <a class="nav-link" href="/Poketrade/my_listings.php">Meine Listings</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="create_listing.php">Listing erstellen</a>
+                        <a class="nav-link" href="/Poketrade/create_listing.php">Listing erstellen</a>
                     </li>
 
                     <?php if (!empty($_SESSION['role']) && $_SESSION['role'] === 'admin'): ?>
                         <li class="nav-item">
-                            <a class="nav-link" href="admin_panel.php">Admin Panel</a>
+                            <a class="nav-link" href="/Poketrade/admin/index.php">Admin Panel</a>
                         </li>
                     <?php endif; ?>
                 <?php endif; ?>
@@ -61,14 +70,14 @@ $pageTitle = $pageTitle ?? 'Poketrade';
                         </span>
                     </li>
                     <li class="nav-item">
-                        <a class="btn btn-outline-light btn-sm" href="logout.php">Logout</a>
+                        <a class="btn btn-outline-light btn-sm" href="/Poketrade/logout.php">Logout</a>
                     </li>
                 <?php else: ?>
                     <li class="nav-item me-2">
-                        <a class="btn btn-outline-light btn-sm" href="login.php">Login</a>
+                        <a class="btn btn-outline-light btn-sm" href="/Poketrade/login.php">Login</a>
                     </li>
                     <li class="nav-item">
-                        <a class="btn btn-warning btn-sm" href="register.php">Registrieren</a>
+                        <a class="btn btn-warning btn-sm" href="/Poketrade/register.php">Registrieren</a>
                     </li>
                 <?php endif; ?>
             </ul>
