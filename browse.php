@@ -83,7 +83,7 @@ require_once __DIR__ . '/includes/header.php';
     <h1 class="mb-4">Alle Listings</h1>
 
     <form method="get" class="row g-2 mb-4">
-        <div class="col-md-4">
+        <div class="col-6 col-md-4 col-lg-2">
             <label class="form-label" for="q">Suche</label>
             <input type="text"
                    class="form-control"
@@ -137,7 +137,7 @@ require_once __DIR__ . '/includes/header.php';
                 $isOwner    = $isLoggedIn && ((int)$_SESSION['user_id'] === (int)$listing['user_id']);
                 $isFav      = $isLoggedIn && in_array($listing['id'], $favIds);
                 ?>
-                <div class="col-md-4">
+                <div class="col-6 col-md-4 col-lg-2">
                     <div class="card h-100 shadow-sm">
                         <?php if (!empty($listing['image_path'])): ?>
                             <img src="<?= htmlspecialchars($listing['image_path']) ?>"

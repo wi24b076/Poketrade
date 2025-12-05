@@ -72,16 +72,14 @@ require_once __DIR__ . '/../includes/header.php';
     <!-- Tabs: Benutzer / Listings -->
     <ul class="nav nav-tabs mb-3" id="adminTabs" role="tablist">
         <li class="nav-item" role="presentation">
-            <button class="nav-link active" id="users-tab" data-bs-toggle="tab"
-                    data-bs-target="#users-tab-pane" type="button" role="tab"
-                    aria-controls="users-tab-pane" aria-selected="true">
+            <button class="nav-link active" id="users-tab" data-bs-toggle="tab" data-bs-target="#users-tab-pane"
+                type="button" role="tab" aria-controls="users-tab-pane" aria-selected="true">
                 Benutzer
             </button>
         </li>
         <li class="nav-item" role="presentation">
-            <button class="nav-link" id="listings-tab" data-bs-toggle="tab"
-                    data-bs-target="#listings-tab-pane" type="button" role="tab"
-                    aria-controls="listings-tab-pane" aria-selected="false">
+            <button class="nav-link" id="listings-tab" data-bs-toggle="tab" data-bs-target="#listings-tab-pane"
+                type="button" role="tab" aria-controls="listings-tab-pane" aria-selected="false">
                 Listings
             </button>
         </li>
@@ -190,13 +188,13 @@ require_once __DIR__ . '/../includes/header.php';
                                                 </span>
                                             </td>
                                             <td>
-                                                <?php echo number_format((float)$listing['price'], 2, ',', '.'); ?>
+                                                <?php echo number_format((float) $listing['price'], 2, ',', '.'); ?>
                                             </td>
                                             <td><?php echo htmlspecialchars($listing['created_at']); ?></td>
                                             <td>
                                                 <div class="btn-group btn-group-sm" role="group">
                                                     <a href="/Poketrade/card_detail.php?id=<?php echo urlencode($listing['id']); ?>"
-                                                       class="btn btn-outline-secondary">
+                                                        class="btn btn-outline-secondary">
                                                         Ansehen
                                                     </a>
                                                     <!-- Hier später: Admin-Bearbeiten / Löschen -->
