@@ -43,7 +43,7 @@ require_once __DIR__ . '/includes/header.php';
 <?php else: ?>
     <div class="row g-4">
         <?php foreach ($listings as $listing): ?>
-            <div class="col-md-4">
+            <div class="col-6 col-md-4 col-lg-2">
                 <div class="card h-100 shadow-sm">
                     <?php if (!empty($listing['image_path'])): ?>
                         <img src="<?= htmlspecialchars($listing['image_path']) ?>"
