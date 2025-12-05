@@ -1,11 +1,13 @@
 <?php
-if (session_status() === PHP_SESSION_NONE) {
-    session_start();
-}
+require_once __DIR__ . '/auth.php';
 
-// Optional: Seitentitel setzen, wenn nicht definiert
+// Auto-Login über Remember-Me-Cookie (setzt ggf. $_SESSION)
+init_auth($pdo);
+
+// Seitentitel setzen, wenn nicht definiert
 $pageTitle = $pageTitle ?? 'Poketrade';
 ?>
+
 <!DOCTYPE html>
 <html lang="de">
 
@@ -13,6 +15,8 @@ $pageTitle = $pageTitle ?? 'Poketrade';
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title><?= htmlspecialchars($pageTitle) ?></title>
+    <link rel="icon" type="image/png" href="/Poketrade/assets/favicon.png">
+
 
     <!-- Bootstrap 5 CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"
