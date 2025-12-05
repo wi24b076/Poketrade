@@ -18,3 +18,10 @@ body {
     font-family: 'pokemon', sans-serif !important;
     letter-spacing: 1px;
 }
+
+.navbar .nav-link {
+    font-size: 1.2rem;
+    margin-right: 1rem; 
+    padding: 0.6rem 1rem;
+}
+
