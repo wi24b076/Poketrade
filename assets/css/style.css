@@ -25,6 +25,12 @@ body {
     padding: 0.6rem 1rem;
 }
 
+.carousel-img {
+    height: 350px;     /* gewünschte Höhe */
+    object-fit: cover; /* Bild wird zugeschnitten ohne Verzerrung */
+}
+
+
 
 
 
