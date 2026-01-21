@@ -34,6 +34,9 @@ $maxPrice  = $_GET['max_price']  ?? '';
 $where  = [];
 $params = [];
 
+// Gesperrte Listings ausblenden
+$where[] = 'l.is_blocked = 0';
+
 // Suchtext
 if ($search !== '') {
     $where[] = '(l.title LIKE :search OR l.description LIKE :search)';

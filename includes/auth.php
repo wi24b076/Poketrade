@@ -42,7 +42,7 @@ function try_auto_login_from_cookie(PDO $pdo): void
     // Cookie-Werte in Variablen speichern.
     // Diese enthalten: User-ID und Token (Klartext).
     $userId = $_COOKIE['remember_id'];
-    $token  = $_COOKIE['remember_token'];
+    $token = $_COOKIE['remember_token'];
 
     // Sicherheitsprüfung: Die User-ID muss ein reiner Zahlenstring sein.
     // Dadurch verhindert man manipulierte oder ungültige Cookie-Werte.
@@ -55,7 +55,7 @@ function try_auto_login_from_cookie(PDO $pdo): void
     // - Für den User mit der ID aus dem Cookie
     // - Verbunden mit den Userdaten aus der users-Tabelle
     $stmt = $pdo->prepare("
-        SELECT rt.*, u.username, u.email, u.role
+        SELECT rt.*, u.username, u.email, u.role, u.is_blocked
         FROM remember_tokens rt
         JOIN users u ON rt.user_id = u.id
         WHERE rt.user_id = :uid
@@ -63,7 +63,7 @@ function try_auto_login_from_cookie(PDO $pdo): void
         ORDER BY rt.created_at DESC     -- Neuester Token zuerst
         LIMIT 1                          -- Nur ein Ergebnis zurückgeben
     ");
-    
+
     // Die Query ausführen und den Platzhalter :uid mit der User-ID befüllen.
     // PDO kümmert sich um sicheres Binden und Schutz vor SQL-Injection.
     $stmt->execute([':uid' => $userId]);
@@ -79,6 +79,20 @@ function try_auto_login_from_cookie(PDO $pdo): void
         return;
     }
 
+    // 🔒 Wenn User gesperrt ist: nicht auto-einloggen + Cookies/Token entfernen
+    if ((int) $row['is_blocked'] === 1) {
+        // Token in DB löschen
+        $del = $pdo->prepare("DELETE FROM remember_tokens WHERE user_id = :uid");
+        $del->execute([':uid' => (int) $userId]);
+
+        // Cookies löschen
+        setcookie('remember_id', '', time() - 3600, '/');
+        setcookie('remember_token', '', time() - 3600, '/');
+
+        return;
+    }
+
+
     // Jetzt prüfen wir, ob der Token aus dem Cookie
     // zum gehashten Token aus der Datenbank passt.
     // Dazu wird password_verify benutzt, da token_hash mit password_hash erstellt wurde.
@@ -91,13 +105,13 @@ function try_auto_login_from_cookie(PDO $pdo): void
     // - Token ist gültig und nicht abgelaufen
     // - Token-Hash passt
     // -> Benutzer erfolgreich automatisch eingeloggt.
-    
+
     // Login-Daten in der Session speichern.
     // Diese Werte werden überall im Projekt benutzt.
-    $_SESSION['user_id']   = $row['user_id'];
-    $_SESSION['username']  = $row['username'];
-    $_SESSION['email']     = $row['email'];
-    $_SESSION['role']      = $row['role'];
+    $_SESSION['user_id'] = $row['user_id'];
+    $_SESSION['username'] = $row['username'];
+    $_SESSION['email'] = $row['email'];
+    $_SESSION['role'] = $row['role'];
 }
 
 
