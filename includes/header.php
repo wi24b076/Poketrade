@@ -76,6 +76,8 @@ $pageTitle = $pageTitle ?? 'Poketrade';
                         <li class="nav-item">
                             <a class="nav-link pokemon-font" href="/Poketrade/favorites.php">Favoriten</a>
                         </li>
+                        <li class="nav-item">
+                            <a class="nav-link pokemon-font" href="/Poketrade/profile.php">Mein Profil</a>
 
                         <!-- Nur sichtbar für Admins -->
                         <?php if (!empty($_SESSION['role']) && $_SESSION['role'] === 'admin'): ?>
