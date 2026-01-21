@@ -17,7 +17,7 @@ require_admin();
 try {
     // Alle Benutzer
     $stmtUsers = $pdo->query("
-        SELECT id, username, email, role, created_at
+        SELECT id, username, email, role, created_at, is_blocked
         FROM users
         ORDER BY created_at DESC
     ");
@@ -25,12 +25,25 @@ try {
 
     // Alle Listings
     $stmtListings = $pdo->query("
-        SELECT l.id, l.title, l.card_condition, l.price, l.created_at, u.username
+        SELECT l.id, l.title, l.card_condition, l.price, l.created_at, u.username, l.is_blocked
         FROM listings l
         JOIN users u ON l.user_id = u.id
         ORDER BY l.created_at DESC
     ");
     $listings = $stmtListings->fetchAll(PDO::FETCH_ASSOC);
+
+    // Statistiken
+    $stmtStats = $pdo->query("SELECT COUNT(*) AS user_count FROM users");
+    $userCount = $stmtStats->fetchColumn();
+
+    $stmtStats = $pdo->query("SELECT COUNT(*) AS listing_count FROM listings");
+    $listingCount = $stmtStats->fetchColumn();
+
+    $stmtStats = $pdo->query("SELECT COUNT(*) AS blocked_users FROM users WHERE is_blocked = 1");
+    $blockedUserCount = $stmtStats->fetchColumn();
+
+    $stmtStats = $pdo->query("SELECT COUNT(*) AS blocked_listings FROM listings WHERE is_blocked = 1");
+    $blockedListingCount = $stmtStats->fetchColumn();
 
 } catch (PDOException $e) {
     die('Fehler beim Laden der Admin-Daten: ' . htmlspecialchars($e->getMessage()));
@@ -49,13 +62,13 @@ require_once __DIR__ . '/../includes/header.php';
         <span class="badge bg-warning text-dark">Admin</span>
     </div>
 
-    <!-- Kleine Stat-Karten -->
+    <!-- Stat-Karten -->
     <div class="row g-3 mb-4">
         <div class="col-md-6 col-lg-3">
             <div class="card shadow-sm">
                 <div class="card-body">
                     <h2 class="h6 text-muted mb-1">Benutzer insgesamt</h2>
-                    <p class="h3 mb-0"><?php echo count($users); ?></p>
+                    <p class="h3 mb-0"><?= $userCount ?></p>
                 </div>
             </div>
         </div>
@@ -63,7 +76,23 @@ require_once __DIR__ . '/../includes/header.php';
             <div class="card shadow-sm">
                 <div class="card-body">
                     <h2 class="h6 text-muted mb-1">Listings insgesamt</h2>
-                    <p class="h3 mb-0"><?php echo count($listings); ?></p>
+                    <p class="h3 mb-0"><?= $listingCount ?></p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6 col-lg-3">
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <h2 class="h6 text-muted mb-1">Gesperrte Benutzer</h2>
+                    <p class="h3 mb-0"><?= $blockedUserCount ?></p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6 col-lg-3">
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <h2 class="h6 text-muted mb-1">Gesperrte Listings</h2>
+                    <p class="h3 mb-0"><?= $blockedListingCount ?></p>
                 </div>
             </div>
         </div>
@@ -92,7 +121,7 @@ require_once __DIR__ . '/../includes/header.php';
                 <div class="card-header d-flex justify-content-between align-items-center">
                     <h2 class="h5 mb-0">Benutzerübersicht</h2>
                     <span class="badge bg-secondary">
-                        <?php echo count($users); ?> Benutzer
+                        <?= count($users); ?> Benutzer
                     </span>
                 </div>
                 <div class="card-body p-0">
@@ -106,22 +135,33 @@ require_once __DIR__ . '/../includes/header.php';
                                         <th>Email</th>
                                         <th>Rolle</th>
                                         <th>Registriert am</th>
+                                        <th>Aktionen</th>
                                     </tr>
                                 </thead>
                                 <tbody>
                                     <?php foreach ($users as $user): ?>
                                         <tr>
-                                            <td><?php echo htmlspecialchars($user['id']); ?></td>
-                                            <td><?php echo htmlspecialchars($user['username']); ?></td>
-                                            <td><?php echo htmlspecialchars($user['email']); ?></td>
+                                            <td><?= htmlspecialchars($user['id']) ?></td>
+                                            <td><?= htmlspecialchars($user['username']) ?></td>
+                                            <td><?= htmlspecialchars($user['email']) ?></td>
                                             <td>
-                                                <?php if ($user['role'] === 'admin'): ?>
-                                                    <span class="badge bg-danger">admin</span>
-                                                <?php else: ?>
-                                                    <span class="badge bg-primary">user</span>
-                                                <?php endif; ?>
+                                                <?= $user['role'] === 'admin' ? 
+                                                    '<span class="badge bg-danger">Admin</span>' : 
+                                                    '<span class="badge bg-primary">User</span>' ?>
                                             </td>
-                                            <td><?php echo htmlspecialchars($user['created_at']); ?></td>
+                                            <td><?= htmlspecialchars($user['created_at']) ?></td>
+                                            <td>
+                                                <form method="post" action="user_toggle_block.php" style="display:inline">
+                                                    <input type="hidden" name="user_id" value="<?= $user['id'] ?>">
+                                                    <button type="submit" class="btn btn-sm btn-warning">
+                                                        <?= $user['is_blocked'] ? 'Entsperren' : 'Sperren' ?>
+                                                    </button>
+                                                </form>
+                                                <form method="post" action="user_delete.php" style="display:inline" onsubmit="return confirm('Benutzer wirklich löschen?');">
+                                                    <input type="hidden" name="user_id" value="<?= $user['id'] ?>">
+                                                    <button type="submit" class="btn btn-sm btn-outline-danger">Löschen</button>
+                                                </form>
+                                            </td>
                                         </tr>
                                     <?php endforeach; ?>
                                 </tbody>
@@ -140,7 +180,7 @@ require_once __DIR__ . '/../includes/header.php';
                 <div class="card-header d-flex justify-content-between align-items-center">
                     <h2 class="h5 mb-0">Alle Listings</h2>
                     <span class="badge bg-secondary">
-                        <?php echo count($listings); ?> Listings
+                        <?= count($listings); ?> Listings
                     </span>
                 </div>
                 <div class="card-body p-0">
@@ -161,44 +201,23 @@ require_once __DIR__ . '/../includes/header.php';
                                 <tbody>
                                     <?php foreach ($listings as $listing): ?>
                                         <tr>
-                                            <td><?php echo htmlspecialchars($listing['id']); ?></td>
-                                            <td><?php echo htmlspecialchars($listing['title']); ?></td>
-                                            <td><?php echo htmlspecialchars($listing['username']); ?></td>
+                                            <td><?= htmlspecialchars($listing['id']) ?></td>
+                                            <td><?= htmlspecialchars($listing['title']) ?></td>
+                                            <td><?= htmlspecialchars($listing['username']) ?></td>
+                                            <td><?= htmlspecialchars($listing['card_condition']) ?></td>
+                                            <td><?= number_format((float) $listing['price'], 2, ',', '.') ?> €</td>
+                                            <td><?= htmlspecialchars($listing['created_at']) ?></td>
                                             <td>
-                                                <?php
-                                                $condition = $listing['card_condition'] ?? '';
-                                                $badgeClass = 'secondary';
-                                                switch ($condition) {
-                                                    case 'mint':
-                                                        $badgeClass = 'success';
-                                                        break;
-                                                    case 'good':
-                                                        $badgeClass = 'primary';
-                                                        break;
-                                                    case 'played':
-                                                        $badgeClass = 'warning';
-                                                        break;
-                                                    case 'poor':
-                                                        $badgeClass = 'danger';
-                                                        break;
-                                                }
-                                                ?>
-                                                <span class="badge bg-<?php echo $badgeClass; ?>">
-                                                    <?php echo htmlspecialchars($condition); ?>
-                                                </span>
-                                            </td>
-                                            <td>
-                                                <?php echo number_format((float) $listing['price'], 2, ',', '.'); ?>
-                                            </td>
-                                            <td><?php echo htmlspecialchars($listing['created_at']); ?></td>
-                                            <td>
-                                                <div class="btn-group btn-group-sm" role="group">
-                                                    <a href="/Poketrade/card_detail.php?id=<?php echo urlencode($listing['id']); ?>"
-                                                        class="btn btn-outline-secondary">
-                                                        Ansehen
-                                                    </a>
-                                                    <!-- Hier später: Admin-Bearbeiten / Löschen -->
-                                                </div>
+                                                <form method="post" action="listing_toggle_block.php" style="display:inline">
+                                                    <input type="hidden" name="listing_id" value="<?= $listing['id'] ?>">
+                                                    <button type="submit" class="btn btn-sm btn-warning">
+                                                        <?= $listing['is_blocked'] ? 'Entsperren' : 'Sperren' ?>
+                                                    </button>
+                                                </form>
+                                                <form method="post" action="listing_delete.php" style="display:inline" onsubmit="return confirm('Listing wirklich löschen?');">
+                                                    <input type="hidden" name="listing_id" value="<?= $listing['id'] ?>">
+                                                    <button type="submit" class="btn btn-sm btn-outline-danger">Löschen</button>
+                                                </form>
                                             </td>
                                         </tr>
                                     <?php endforeach; ?>
@@ -216,3 +235,4 @@ require_once __DIR__ . '/../includes/header.php';
 
 <?php
 require_once __DIR__ . '/../includes/footer.php';
+?>
